@@ -1,5 +1,6 @@
 #! /bin/sh
 set -e
 
-rm -rf ./data
-../besu/build/install/besu/bin/besu --config-file ./tls_config.toml
+BESU_INSTALL="$HOME/dev/besu/build/install/besu"
+
+"$BESU_INSTALL/bin/besu" --config-file ./besu_tls_config.toml

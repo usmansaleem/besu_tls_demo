@@ -20,9 +20,11 @@ ORION_KEY="./orion/keystore/orion_for_besu.key"
 # Keystores in EthSigner
 ETHSIGNER_KEYSTORE="./ethsigner/keystore/keystore.pfx"
 ETHSIGNER_PASSWORD_FILE="./ethsigner/keystore/password.txt"
+ETHSIGNER_TLS_KNOWN_CLIENTS="./ethsigner/keystore/knownClients.txt"
 ETHSIGNER_BESU_AUTH_KEYSTORE="./ethsigner/besu/keystore/keystore.pfx"
 ETHSIGNER_BESU_AUTH_PASSWORD_FILE="./ethsigner/besu/keystore/password.txt"
 ETHSIGNER_BESU_AUTH_KNOWN_SERVER_FILE="./ethsigner/besu/keystore/knownBesuServers.txt"
+ETHSIGNER_CURL_CLIENT_KEYSTORE="./ethsigner/curl/keystore/keystore.pfx"
 
 # internal usage
 _ORION_KEYSTORE="./orion/keystore/keystore.pfx"
@@ -32,6 +34,7 @@ mkdir -p ./besu/orion/keystore
 mkdir -p ./orion/keystore
 mkdir -p ./ethsigner/keystore/
 mkdir -p ./ethsigner/besu/keystore/
+mkdir -p ./ethsigner/curl/keystore/
 
 echo "Generating self signed certificates ..."
 # Besu Self Signed Certificate
@@ -63,6 +66,11 @@ keytool -genkeypair -keystore "$ETHSIGNER_BESU_AUTH_KEYSTORE" -storetype PKCS12 
 -keyalg RSA -keysize 2048 -validity 700 -dname "CN=ethsigner_besu_test, OU=PegaSys, O=ConsenSys, L=Brisbane, ST=QLD, C=AU" \
 -ext san=dns:localhost,ip:127.0.0.1
 
+# Curl Self Signed Certificate for connecting to EthSigner
+keytool -genkeypair -keystore "$ETHSIGNER_CURL_CLIENT_KEYSTORE" -storetype PKCS12 -storepass changeit -alias curl_certs \
+-keyalg RSA -keysize 2048 -validity 700 -dname "CN=curl_ethsigner_test, OU=PegaSys, O=ConsenSys, L=Brisbane, ST=QLD, C=AU" \
+-ext san=dns:localhost,ip:127.0.0.1
+
 echo "Generating keystore password files"
 printf "changeit" > "$BESU_PASSWORD_FILE"
 printf "changeit" > "$BESU_ORION_PRIV_PASSWORD_FILE"
@@ -75,6 +83,7 @@ BESU_ORION_SHA256=`openssl pkcs12 -in $BESU_ORION_PRIV_KEYSTORE -nodes -passin p
 ORION_SHA256=`openssl x509 -in $ORION_PEM -sha256 -fingerprint -noout | awk -F'=' '{print $2}'`
 ETHSIGNER_SHA256=`openssl pkcs12 -in $ETHSIGNER_KEYSTORE -nodes -passin pass:changeit -nomacver | openssl x509 -sha256 -fingerprint -noout | awk -F'=' '{print $2}'`
 ETHSIGNER_BESU_SHA256=`openssl pkcs12 -in $ETHSIGNER_BESU_AUTH_KEYSTORE -nodes -passin pass:changeit -nomacver | openssl x509 -sha256 -fingerprint -noout | awk -F'=' '{print $2}'`
+CURL_ETHSIGNER_SHA256=`openssl pkcs12 -in $ETHSIGNER_CURL_CLIENT_KEYSTORE -nodes -passin pass:changeit -nomacver | openssl x509 -sha256 -fingerprint -noout | awk -F'=' '{print $2}'`
 
 echo "Besu Fingerprint: $BESU_SHA256"
 echo "Besu-Orion Fingerprint: $BESU_ORION_SHA256"
@@ -129,4 +138,10 @@ echo "Generating EthSigner-Besu knownServers.txt"
 cat << EOF > $ETHSIGNER_BESU_AUTH_KNOWN_SERVER_FILE
 localhost:8545 $BESU_SHA256
 127.0.0.1:8545 $BESU_SHA256
+EOF
+
+# create EthSigner knownClients.txt by adding CURL certificate fingerprint
+echo "Generating Curl-EthSigner knownClients.txt"
+cat << EOF > $ETHSIGNER_TLS_KNOWN_CLIENTS
+curl_ethsigner_test $CURL_ETHSIGNER_SHA256
 EOF

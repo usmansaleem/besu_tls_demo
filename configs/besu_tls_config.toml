@@ -25,7 +25,7 @@ privacy-public-key-file="./orion/nodeKey.pub"
 # Privacy TLS Options
 privacy-tls-enabled=true
 privacy-tls-keystore-file="./orion/keystore/keystore.pfx"
-privacy-tls-keystore-password-file="./orion/keystore/password.txt"
+privacy-tls-keystore-password-file="./keystore/password.txt"
 privacy-tls-known-enclave-file="./orion/keystore/knownServers.txt"
 
 data-path="./data"

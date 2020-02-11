@@ -22,6 +22,7 @@ ETHSIGNER_KEYSTORE="./ethsigner/keystore/keystore.pfx"
 ETHSIGNER_PASSWORD_FILE="./ethsigner/keystore/password.txt"
 ETHSIGNER_BESU_AUTH_KEYSTORE="./ethsigner/besu/keystore/keystore.pfx"
 ETHSIGNER_BESU_AUTH_PASSWORD_FILE="./ethsigner/besu/keystore/password.txt"
+ETHSIGNER_BESU_AUTH_KNOWN_SERVER_FILE="./ethsigner/besu/keystore/knownBesuServers.txt"
 
 # internal usage
 _ORION_KEYSTORE="./orion/keystore/keystore.pfx"
@@ -63,10 +64,10 @@ keytool -genkeypair -keystore "$ETHSIGNER_BESU_AUTH_KEYSTORE" -storetype PKCS12 
 -ext san=dns:localhost,ip:127.0.0.1
 
 echo "Generating keystore password files"
-echo "changeit" > "$BESU_PASSWORD_FILE"
-echo "changeit" > "$BESU_ORION_PRIV_PASSWORD_FILE"
-echo "changeit" > "$ETHSIGNER_PASSWORD_FILE"
-echo "changeit" > "$ETHSIGNER_BESU_AUTH_PASSWORD_FILE"
+printf "changeit" > "$BESU_PASSWORD_FILE"
+printf "changeit" > "$BESU_ORION_PRIV_PASSWORD_FILE"
+printf "changeit" > "$ETHSIGNER_PASSWORD_FILE"
+printf "changeit" > "$ETHSIGNER_BESU_AUTH_PASSWORD_FILE"
 
 
 BESU_SHA256=`openssl pkcs12 -in $BESU_KEYSTORE -nodes -passin pass:changeit -nomacver | openssl x509 -sha256 -fingerprint -noout | awk -F'=' '{print $2}'`
@@ -116,4 +117,16 @@ EOF
 echo "Generating Besu knownClients.txt"
 cat << EOF > $BESU_KNOWN_CLIENTS_FILE
 ethsigner_besu_test $ETHSIGNER_BESU_SHA256
+EOF
+
+# Copy EthSigner configs and scripts
+cp "./configs/1-launchVaultDocker.sh" ./ethsigner/
+cp "./configs/2-initVault.sh" ./ethsigner/
+cp "./configs/start_ethsigner.sh" ./ethsigner/
+
+# create knownServers.txt by adding Besu fingerprint
+echo "Generating EthSigner-Besu knownServers.txt"
+cat << EOF > $ETHSIGNER_BESU_AUTH_KNOWN_SERVER_FILE
+localhost:8545 $BESU_SHA256
+127.0.0.1:8545 $BESU_SHA256
 EOF

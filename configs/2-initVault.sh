@@ -26,10 +26,8 @@ echo "Enable kv-v2 secret engine path at /secret"
 curl -s -k -X POST -H "X-Vault-Token: $VAULT_TOKEN" \
  -d '{"type": "kv", "options": {"version": "2"}}' "$VAULT_HOST/sys/mounts/secret" | jq
 
-## Generate a random 32 bytes keys
-echo "Generating random key"
-KEY=$(openssl rand -hex 32)
-echo "Encryption Key: $KEY"
+KEY="8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63"
+echo "Signing Key (from dev.json): $KEY"
 
  # Place ethsignerSigningKey
  echo "Create key in vault"

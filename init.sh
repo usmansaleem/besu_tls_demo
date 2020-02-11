@@ -68,7 +68,7 @@ keytool -genkeypair -keystore "$ETHSIGNER_BESU_AUTH_KEYSTORE" -storetype PKCS12 
 
 # Curl Self Signed Certificate for connecting to EthSigner
 keytool -genkeypair -keystore "$ETHSIGNER_CURL_CLIENT_KEYSTORE" -storetype PKCS12 -storepass changeit -alias curl_certs \
--keyalg RSA -keysize 2048 -validity 700 -dname "CN=curl_ethsigner_test, OU=PegaSys, O=ConsenSys, L=Brisbane, ST=QLD, C=AU" \
+-keyalg RSA -keysize 2048 -validity 700 -dname "CN=curl, OU=PegaSys, O=ConsenSys, L=Brisbane, ST=QLD, C=AU" \
 -ext san=dns:localhost,ip:127.0.0.1
 
 echo "Generating keystore password files"
@@ -129,9 +129,10 @@ ethsigner_besu_test $ETHSIGNER_BESU_SHA256
 EOF
 
 # Copy EthSigner configs and scripts
+echo "Copying EthSigner scripts ..."
 cp "./configs/1-launchVaultDocker.sh" ./ethsigner/
 cp "./configs/2-initVault.sh" ./ethsigner/
-cp "./configs/start_ethsigner.sh" ./ethsigner/
+cp "./configs/3-start_ethsigner.sh" ./ethsigner/
 
 # create knownServers.txt by adding Besu fingerprint
 echo "Generating EthSigner-Besu knownServers.txt"
@@ -143,5 +144,5 @@ EOF
 # create EthSigner knownClients.txt by adding CURL certificate fingerprint
 echo "Generating Curl-EthSigner knownClients.txt"
 cat << EOF > $ETHSIGNER_TLS_KNOWN_CLIENTS
-curl_ethsigner_test $CURL_ETHSIGNER_SHA256
+curl $CURL_ETHSIGNER_SHA256
 EOF

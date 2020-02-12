@@ -45,6 +45,7 @@ cd ethsigner
 ~~~
 
 * Test EthSigner via curl (Using curl client keystore)
+Note: privateFrom/privateTo is Orion public/private key (in eea_sendTransaction)
 ~~~
 curl --cert-type P12 --cert ./ethsigner/curl/keystore/keystore.pfx:changeit --insecure -X GET https://127.0.0.1:8646/upcheck
 

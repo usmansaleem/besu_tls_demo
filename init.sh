@@ -98,6 +98,8 @@ cp ./configs/orion.conf ./orion/
 echo "Generating Orion Keys"
 yes 123456 | "$ORION_INSTALL/bin/orion" -g ./orion/nodeKey
 
+ORION_PUB_KEY=`cat ./orion/nodeKey.pub`
+
 # Create password file
 echo "Generating Orion password file"
 cat << EOF > ./orion/passwordFile
@@ -146,3 +148,9 @@ echo "Generating Curl-EthSigner knownClients.txt"
 cat << EOF > $ETHSIGNER_TLS_KNOWN_CLIENTS
 curl $CURL_ETHSIGNER_SHA256
 EOF
+
+echo "curl test command for EthSigner"
+echo "curl --cert-type P12 --cert ./ethsigner/curl/keystore/keystore.pfx:changeit --insecure -X POST \
+   --data '{\"jsonrpc\":\"2.0\",\"method\":\"eea_sendTransaction\",\"params\":[{\"from\": \"0xfe3b557e8fb62b89f4916b721be55ceb828dbd73\" \
+   ,\"data\": \"0x608060405234801561001057600080fd5b5060dc8061001f6000396000f3006080604052600436106049576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680633fa4f24514604e57806355241077146076575b600080fd5b348015605957600080fd5b50606060a0565b6040518082815260200191505060405180910390f35b348015608157600080fd5b50609e6004803603810190808035906020019092919050505060a6565b005b60005481565b80600081905550505600a165627a7a723058202bdbba2e694dba8fff33d9d0976df580f57bff0a40e25a46c398f8063b4c00360029\", \
+   \"privateFrom\": \"$ORION_PUB_KEY\",\"privateFor\": [\"$ORION_PUB_KEY\"],\"restriction\": \"restricted\"}], \"id\":1}' https://127.0.0.1:8646"

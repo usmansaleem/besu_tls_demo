@@ -5,7 +5,7 @@ rpc-http-cors-origins=["all"]
 host-whitelist=["*"]
 rpc-ws-enabled=true
 
-min-gas-price=100
+min-gas-price=0
 
 rpc-http-enabled=true
 rpc-http-port=8545

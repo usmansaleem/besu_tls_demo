@@ -1,4 +1,5 @@
 #! /bin/bash
+
 set -e
 
 ORION_INSTALL="$HOME/dev/orion/build/install/orion/"
